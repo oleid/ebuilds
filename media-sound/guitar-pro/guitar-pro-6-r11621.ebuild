@@ -15,7 +15,7 @@ LICENSE="GuitarPro"
 
 SLOT="0"
 KEYWORDS="amd64 x86"
-IUSE="+soundbanks +doc +system-qt"
+IUSE="+soundbanks doc system-qt"
 
 
 MY_GP=opt/GuitarPro6
@@ -30,11 +30,12 @@ SRC_URI="
 	soundbanks? ( http://download3.guitar-pro.com/4eca2d7bd63ca87557e6dcb5615b8d55/5538025f/gp$PV/$MY_SB )
 	doc? ( http://download3.guitar-pro.com/9ea44addbe11595b137aa931e2a33cb2/5538029f/gp$PV/GP$PV%20Users%20Manual%20EN.pdf )"
 
-RDEPEND=" 
-		dev-libs/libxml2[abi_x86_32]
-		dev-libs/openssl:0.9.8[abi_x86_32]
-		media-libs/portaudio[abi_x86_32]
-		media-sound/pulseaudio[abi_x86_32,caps]
+RDEPEND="
+        x11-libs/gksu
+        dev-libs/libxml2[abi_x86_32]
+        dev-libs/openssl:0.9.8[abi_x86_32]
+        media-libs/portaudio[abi_x86_32]
+        media-sound/pulseaudio[abi_x86_32,caps]
         system-qt? (
             dev-qt/qtcore:4[abi_x86_32]
 		    dev-qt/qtgui:4[abi_x86_32]
@@ -43,11 +44,11 @@ RDEPEND="
             dev-qt/qtwebkit:4[abi_x86_32]
             dev-qt/qtxmlpatterns:4[abi_x86_32]
         )
-		amd64? (
-			>=sys-devel/gcc-4.6.0[multilib]
-			>=sys-libs/glibc-2.15[multilib]
-		)
-		"
+        amd64? (
+            >=sys-devel/gcc-4.6.0[multilib]
+            >=sys-libs/glibc-2.15[multilib]
+        )
+        "
 
 DEPEND="sys-devel/binutils"
 
@@ -60,7 +61,7 @@ src_unpack() {
 
 src_install() {
     exeinto /$MY_GP
-    for fn in GPBankInstaller GuitarPro launcher.sh; do
+    for fn in GPBankInstaller GPInstaller GPUpdater GPConverter GuitarPro launcher.sh; do
         doexe $MY_GP/$fn
     done
 
@@ -70,8 +71,7 @@ src_install() {
 
     for fn in \
         usr/share/pixmaps/guitarpro6.png \
-        $MY_GP/lib*.so \
-        $MY_GP/libboost* \
+        $MY_GP/lib*.so* \
         $MY_GP/Presets ; do
         insinto /$(dirname "$fn")
         [ -f $fn ] && doins "./$fn" || doins -r "./$fn"
@@ -93,6 +93,7 @@ pkg_postinst() {
         elog "/opt/GuitarPro6/GPBankInstaller $DISTDIR/$MY_SB /$MY_GP"
         elog
     fi
-    use doc && elog "The manual is located in /$MY_GP"
+    use doc && elog "The manual is located in /$MY_GP" && elog
+    elog "If Guitar Pro doesn't pick up your GTK+ theme, export GTK2_RC_FILES=\"\$HOME/.gtkrc-2.0\""
 }
 
