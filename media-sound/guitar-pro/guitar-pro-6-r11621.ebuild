@@ -5,7 +5,7 @@
 EAPI=5
 
 inherit eutils
-RESTRICT="mirror strip"
+RESTRICT="mirror strip fetch"
 
 
 DESCRIPTION="Guitar Pro 6"
@@ -15,7 +15,7 @@ LICENSE="GuitarPro"
 
 SLOT="0"
 KEYWORDS="amd64 x86"
-IUSE="+soundbanks doc system-qt"
+IUSE="+soundbanks system-qt"
 
 
 MY_GP=opt/GuitarPro6
@@ -26,11 +26,12 @@ QA_PRESTRIPPED="$MY_GP/*"
 QA_WX_LOAD="$MY_GP/*"
 
 SRC_URI="
-	http://download3.guitar-pro.com/0f2e6ccfe2293cee1d8299027dfd5812/5538023e/gp$PV/gp$PV-full-linux-$PR.deb
-	soundbanks? ( http://download3.guitar-pro.com/4eca2d7bd63ca87557e6dcb5615b8d55/5538025f/gp$PV/$MY_SB )
-	doc? ( http://download3.guitar-pro.com/9ea44addbe11595b137aa931e2a33cb2/5538029f/gp$PV/GP$PV%20Users%20Manual%20EN.pdf )"
+	gp$PV-full-linux-$PR.deb
+	soundbanks? ( $MY_SB )
+	"
 
 RDEPEND="
+	x11-base/xorg-server[xvfb]
         x11-libs/gksu
         dev-libs/libxml2[abi_x86_32]
         dev-libs/openssl:0.9.8[abi_x86_32]
@@ -50,7 +51,10 @@ RDEPEND="
         )
         "
 
-DEPEND="sys-devel/binutils"
+DEPEND="
+        sys-devel/binutils
+        soundbanks? ( x11-base/xorg-server[xvfb] )
+"
 
 src_unpack() {
     unpack "gp$PV-full-linux-$PR.deb" || die
@@ -67,7 +71,6 @@ src_install() {
 
     # remove unwanted libraries
     use system-qt && rm $MY_GP/libQt*
-    rm $MY_GP/libxml2*
 
     for fn in \
         usr/share/pixmaps/guitarpro6.png \
@@ -81,8 +84,14 @@ src_install() {
 
     # this works only with an working X11 connection
     einfo "Trying to run graphical (ugs) sound bank installer..."
-    use soundbanks &&  $MY_GP/GPBankInstaller --silent $DISTDIR/Banks-r370.gpbank $D/$MY_GP
-    use doc && cp  "$DISTDIR/GP$PV%20Users%20Manual%20EN.pdf" "$D/$MY_GP/GP$PV Users Manual EN.pdf"
+    if use soundbanks ; then
+        DISPLAY=":$(( 100 + $RANDOM % 100 ))" # some probably safe val
+        Xvfb $DISPLAY &
+        X_PID=$!
+        einfo "Waiting 5 sek for Xvfb to show up..."
+        $MY_GP/GPBankInstaller --silent $DISTDIR/Banks-r370.gpbank $D/$MY_GP
+        kill $X_PID
+    fi
 }
 
 pkg_postinst() {
@@ -93,7 +102,6 @@ pkg_postinst() {
         elog "/opt/GuitarPro6/GPBankInstaller $DISTDIR/$MY_SB /$MY_GP"
         elog
     fi
-    use doc && elog "The manual is located in /$MY_GP" && elog
     elog "If Guitar Pro doesn't pick up your GTK+ theme, export GTK2_RC_FILES=\"\$HOME/.gtkrc-2.0\""
 }
 
