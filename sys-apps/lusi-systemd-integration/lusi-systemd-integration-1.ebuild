@@ -20,6 +20,6 @@ src_unpack() {
 }
 
 src_install() {
-        insinto /usr/lib/systemd/system-generators/
-        doins ${FILESDIR}/dema-automount-generator
+        exeinto /usr/lib/systemd/system-generators/
+        doexe ${FILESDIR}/dema-automount-generator
 }
