@@ -1,0 +1,7 @@
+
+build() {
+   add_binary "/sbin/nameif"
+   add_module "dummy"
+   add_runscript
+}
+
