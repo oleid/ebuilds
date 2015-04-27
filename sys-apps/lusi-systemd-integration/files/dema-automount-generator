@@ -1,0 +1,29 @@
+#!/bin/sh
+
+svc_dir=/run/systemd/generator
+
+for i in $(seq 1 99); do
+    unit_bn=cluster-dema$i
+    cat << EOF > "${svc_dir}/${unit_bn}.automount"
+[Unit]
+Description=dema${i}s localdisks automount point
+Documentation=file:///usr/lib/systemd/system-generators/dema-automount-generator
+Before=remote-fs.target
+
+[Automount]
+Where=/cluster/dema$i
+EOF
+
+    cat << EOF > "${svc_dir}/${unit_bn}.mount"
+[Unit]
+Description=dema${i}s localdisks
+Documentation=file:///usr/lib/systemd/system-generators/dema-automount-generator
+
+[Mount]
+What=dema$i:/localdisks
+Where=/cluster/dema$i
+Type=nfs
+Options=rw,nosuid,nodev,hard,intr,rsize=8192,wsize=8192,noauto,x-systemd.automount
+EOF
+    ln -s "../${unit_bn}.automount" "${svc_dir}/remote-fs.target.requires"
+done
