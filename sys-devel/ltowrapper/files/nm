@@ -1,0 +1,7 @@
+#! /bin/sh
+COLLECT_LTO_WRAPPER="$(gcc -v |& grep COLLECT_LTO | cut -d= -f2)"
+LTO_PLUGIN_DIR=${COLLECT_LTO_WRAPPER%/lto-wrapper}
+
+touch /tmp/nm
+
+exec /usr/bin/nm --plugin $LTO_PLUGIN_DIR/liblto_plugin.so $*
