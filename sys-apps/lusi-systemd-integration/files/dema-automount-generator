@@ -1,29 +1,100 @@
 #!/bin/sh
+svc_dir="$1"
 
-svc_dir=/run/systemd/generator
+function log() {
+   #echo "lusi-unit-generator: $*"  >> /tmp/lusi-log.txt
+   #echo "lusi-unit-generator: $*"  > /dev/kmesg
+   #logger "lusi-unit-generator: $*"
+}
 
-for i in $(seq 1 99); do
-    unit_bn=cluster-dema$i
-    cat << EOF > "${svc_dir}/${unit_bn}.automount"
+function mp_to_unitbn() {
+   where="$1"
+   if [ "$where" = "/" ]; then
+      echo -
+   else
+      echo ${where#/} | sed -e 's:-:\\x2d:g' -e 's:/:-:g'
+   fi
+}
+
+function mk_automount_unit() {
+   # automatically called from mk_mount_unit
+   local what="$1"
+   local where="$2"
+   local target="$3"
+   local unit_bn=$(mp_to_unitbn $where)
+
+   cat << EOF > "${svc_dir}/${unit_bn}.automount"
 [Unit]
-Description=dema${i}s localdisks automount point
+Description=automount unit for $what
 Documentation=file:///usr/lib/systemd/system-generators/dema-automount-generator
-Before=remote-fs.target
+Before=$target
 
 [Automount]
-Where=/cluster/dema$i
+Where=$where
 EOF
+}
 
-    cat << EOF > "${svc_dir}/${unit_bn}.mount"
+function mk_mount_unit() {
+   local what="$1"
+   local where="$2"
+   local fs="$3"
+   local opts="$4"
+   local unit_bn=$(mp_to_unitbn $where)
+
+   if [ "${fs#nfs}" != "$fs" ] ; then
+      local target="remote-fs.target"
+   else
+      local target="local-fs.target"
+   fi
+
+   if [ -z "$(echo $opts | grep x-systemd.automount)" ] ; then
+      local start_unit="../${unit_bn}.mount"
+   else
+      local start_unit="../${unit_bn}.automount"
+      mk_automount_unit $what $where $target
+   fi
+   cat << EOF > "${svc_dir}/${unit_bn}.mount"
 [Unit]
-Description=dema${i}s localdisks
+Description=mount unit for $what
 Documentation=file:///usr/lib/systemd/system-generators/dema-automount-generator
 
 [Mount]
-What=dema$i:/localdisks
-Where=/cluster/dema$i
-Type=nfs
-Options=rw,nosuid,nodev,hard,intr,rsize=8192,wsize=8192,noauto,x-systemd.automount
+What=$what
+Where=$where
+Type=$fs
+Options=$opts
 EOF
-    ln -s "../${unit_bn}.automount" "${svc_dir}/remote-fs.target.requires"
+
+   req="${svc_dir}/${target}.requires"
+   mkdir -p "$req" && ln -sf "$start_unit" "$req"
+   log " * $what => $where"
+}
+
+
+
+nfsopts="rw,nosuid,nodev,hard,intr,rsize=8192,wsize=8192,noauto,x-systemd.automount"
+
+log "I got this arguments: $*"
+
+log "Creating units for demas"
+for i in $(seq 1 99); do
+    what=dema$i:/localdisks
+    where=/cluster/dema$i
+    mk_mount_unit $what $where nfs "$nfsopts"
 done
+
+
+#### other NFS shares
+log "Creating units for other NFS shares"
+mk_mount_unit 134.96.30.184:/distribution/gentoo-amd64 / nfs ro
+
+mk_mount_unit home-srv:/exports/raid/home /home                 nfs4 user=root,$nfsopts
+mk_mount_unit nucras:/                    /cluster/nucras       nfs4 $nfsopts
+mk_mount_unit mirr-srv1:/hercules_home    /cluster/mirror1-home nfs4 $nfsopts
+mk_mount_unit mirr-srv2:/hercules_home    /cluster/mirror2-home nfs4 $nfsopts
+
+
+### tmpfs mounts
+log "Creating units for tmpfs mounts"
+mk_mount_unit none /localdisks tmpfs mode=755
+mk_mount_unit none /cluster    tmpfs mode=755
