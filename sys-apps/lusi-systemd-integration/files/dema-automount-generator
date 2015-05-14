@@ -5,6 +5,7 @@ function log() {
    #echo "lusi-unit-generator: $*"  >> /tmp/lusi-log.txt
    #echo "lusi-unit-generator: $*"  > /dev/kmesg
    #logger "lusi-unit-generator: $*"
+   true
 }
 
 function mp_to_unitbn() {
@@ -63,6 +64,7 @@ What=$what
 Where=$where
 Type=$fs
 Options=$opts
+TimeoutSec=10
 EOF
 
    req="${svc_dir}/${target}.requires"
@@ -89,12 +91,13 @@ log "Creating units for other NFS shares"
 mk_mount_unit 134.96.30.184:/distribution/gentoo-amd64 / nfs ro
 
 mk_mount_unit home-srv:/exports/raid/home /home                 nfs4 user=root,$nfsopts
-mk_mount_unit nucras:/                    /cluster/nucras       nfs4 $nfsopts
-mk_mount_unit mirr-srv1:/hercules_home    /cluster/mirror1-home nfs4 $nfsopts
-mk_mount_unit mirr-srv2:/hercules_home    /cluster/mirror2-home nfs4 $nfsopts
 
 
 ### tmpfs mounts
 log "Creating units for tmpfs mounts"
 mk_mount_unit none /localdisks tmpfs mode=755
-mk_mount_unit none /cluster    tmpfs mode=755
+
+
+### bind mount
+log "Create bind mount of rootfs"
+mk_mount_unit / /rootfs none bind
