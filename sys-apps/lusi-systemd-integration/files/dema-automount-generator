@@ -78,12 +78,13 @@ nfsopts="rw,nosuid,nodev,hard,intr,rsize=8192,wsize=8192,noauto,x-systemd.automo
 
 log "I got this arguments: $*"
 
-log "Creating units for demas"
-for i in $(seq 1 99); do
-    what=dema$i:/localdisks
-    where=/cluster/dema$i
-    mk_mount_unit $what $where nfs "$nfsopts"
-done
+# moved to autofs, c.f. lusi-autofs-integration
+#log "Creating units for demas"
+#for i in $(seq 1 99); do
+#    what=dema$i:/localdisks
+#    where=/cluster/dema$i
+#    mk_mount_unit $what $where nfs "$nfsopts"
+#done
 
 
 #### other NFS shares
