@@ -6,7 +6,7 @@ inherit eutils
 
 DESCRIPTION="Modular initramfs image creation utility ported from Arch Linux"
 HOMEPAGE="http://www.archlinux.org/"
-SRC_URI="ftp://ftp.archlinux.org/other/${PN}/${PN}-${PV}.tar.gz"
+SRC_URI="https://projects.archlinux.org/${PN}.git/snapshot/${P}.tar.gz"
 
 LICENSE="GPL"
 SLOT="0"
@@ -24,6 +24,7 @@ DEPEND=">=sys-apps/busybox-1.19.3-r1[static]
    sys-apps/file
    app-arch/gzip
    sys-apps/coreutils
+   app-text/asciidoc
    app-arch/libarchive"
 RDEPEND="${DEPEND}"
 
