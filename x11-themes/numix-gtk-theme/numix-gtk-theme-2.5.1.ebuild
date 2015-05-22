@@ -17,8 +17,8 @@ KEYWORDS="amd64 x86"
 RDEPEND="x11-themes/gtk-engines-murrine"
 
 src_unpack() {
-	unpack "${A}"
-	mv "Numix-master" "${P}"
+	unpack "${A}" || die
+	mv "Numix-${PV}" "${P}" || die
 }
 
 src_install() {
