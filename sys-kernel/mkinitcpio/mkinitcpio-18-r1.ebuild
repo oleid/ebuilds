@@ -39,4 +39,7 @@ src_install() {
    install -m755 -t "${D}/usr/lib/initcpio/udev/"  ${FILESDIR}/udev/*
 
    install -m644 -t "${D}/usr/lib/initcpio" "${FILESDIR}/snowden.service"
-} 
+
+   # fix path:
+   sed -i 's:/usr/share/kbd/keymaps/:/usr/share/keymaps/:g' "${D}/usr/lib/initcpio/install/sd-vconsole"
+}
