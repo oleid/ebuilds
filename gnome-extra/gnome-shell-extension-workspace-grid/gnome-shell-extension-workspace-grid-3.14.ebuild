@@ -16,6 +16,8 @@ KEYWORDS="amd64 x86"
 DEPEND="app-arch/unzip"
 RDEPEND="gnome-base/gnome-shell"
 
+RESTRICT="mirror"
+
 src_unpack() {
         mkdir "${P}" || die
         cd "${P}" && unpack "${A}"
