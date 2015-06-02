@@ -37,6 +37,7 @@ RDEPEND="
         dev-libs/openssl:0.9.8[abi_x86_32]
         media-libs/portaudio[abi_x86_32]
         media-sound/pulseaudio[abi_x86_32,caps]
+	media-libs/libpng:1.2[abi_x86_32]
         system-qt? (
             dev-qt/qtcore:4[abi_x86_32]
 		    dev-qt/qtgui:4[abi_x86_32]
