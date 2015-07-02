@@ -1,8 +1,5 @@
-#####################################################
-# triobird-overlay ebuild
-# URL: http://code.google.com/p/triobird-overlay/
-# $Id: mfold_util-4.0-r1.ebuild 29 2008-12-17 12:05:44Z triobird $
-#####################################################
+# Ebuild adapted from:
+# https://github.com/lvming/gentoo-overlay/tree/master/sci-biology/mfold_util
 
 inherit eutils
 
@@ -24,12 +21,7 @@ RDEPEND="
 "
 DEPEND="${RDEPEND}"
 
-src_compile() {
-	econf || die "econf failed"
-	emake || die "emake failed"
-}
-
 src_install(){
 	emake DESTDIR="${D}" install || die "emake install failed"
-	dosym sir_graph /usr/bin/sir_graph_ng	
+	dosym sir_graph /usr/bin/sir_graph_ng
 }
