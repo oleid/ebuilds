@@ -22,6 +22,15 @@ build() {
     add_file "/lib/initcpio/udev/11-dm-initramfs.rules" "/lib/udev/rules.d/11-dm-initramfs.rules"
     add_file "/etc/lvm/lvm.conf"
 
+    # add a link of all gcc runtime libs the thin provisioning tools need
+    LIBCPP_PATH=$(tail -n1 /etc/ld.so.conf.d/05gcc-x86_64-pc-linux-gnu.conf)
+
+    for i in $BUILDROOT/$LIBCPP_PATH/* ; do
+       local fn=$(basename $i)
+       add_symlink "/usr/lib/$fn" "$LIBCPP_PATH/$fn"
+    done
+    #
+
     add_runscript
 }
 

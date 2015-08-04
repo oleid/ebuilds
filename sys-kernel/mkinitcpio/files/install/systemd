@@ -151,6 +151,12 @@ build() {
     add_binary "$(readlink -f /usr/lib/libnss_files.so)"
     add_binary "$(readlink -f /usr/lib/libnss_compat.so)"
 
+    # for error console
+    add_binary "/bin/sh"
+    add_binary "/sbin/sulogin"
+    add_file "/etc/shadow"
+    add_file "/etc/gshadow"
+
     # udev wants /etc/group since it doesn't launch with --resolve-names=never
     add_file "/etc/group"
 }
