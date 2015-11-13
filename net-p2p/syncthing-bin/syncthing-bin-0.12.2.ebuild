@@ -51,8 +51,8 @@ src_install() {
 }
 
 pkg_postinst() {
-	elog "This is a breaking change release (0.11.X). If you have other devices that are"
-	elog "running on 0.10.X, you will need to upgrade them as well since these versions"
+	elog "This is a breaking change release (0.12.X). If you have other devices that are"
+	elog "running on 0.11.X, you will need to upgrade them as well since these versions"
 	elog "cannot communicate with each other."
 	elog ""
 	elog "In order to be able to view the Web UI remotely (from another machine),"
