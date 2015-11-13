@@ -24,7 +24,7 @@ SRC_URI="
 RESTRICT="mirror"
 LICENSE="GPL-3+"
 SLOT="0"
-KEYWORDS="x86 amd64"
+KEYWORDS="x86 amd64 arm"
 
 IUSE="doc systemd"
 
