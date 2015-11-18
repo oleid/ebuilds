@@ -13,7 +13,7 @@ SRC_URI="https://github.com/astrada/${PN}/archive/v${PV}.tar.gz"
 
 LICENSE="MIT"
 SLOT="0"
-KEYWORDS="x86 amd64"
+KEYWORDS="x86 amd64 arm"
 IUSE="doc test"
 
 RDEPEND=">=dev-ml/ocurl-0.5.3:=
