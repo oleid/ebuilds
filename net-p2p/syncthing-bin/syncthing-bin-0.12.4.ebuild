@@ -59,6 +59,17 @@ pkg_postinst() {
 	elog "edit your ${config} and change the 127.0.0.1:8080 to 0.0.0.0:8080 in"
 	elog "the 'address' section. This file will only be generated once you start syncthing."
 	elog ""
-	elog "Modify the /etc/conf.d/${PN} file and set the user/group/ and syncthing home directory"
-	elog "before launching. Afterwards, you can start ${PN} by doing a: rc-config start ${PN}"
+	elog "Run syncthing as user without arguments for the very first try."
+	elog ""
+	if use systemd; then
+		elog "To tame syncthing, call systemctl edit --user syncthing and paste"
+		elog "[Service]"
+		elog "IOSchedulingClass=3"
+		elog "CPUSchedulingPolicy=idle"
+		elog ""
+		elog "To run it on every boot: systemctl enable --user syncthing "
+	else
+		elog "Modify the /etc/conf.d/${PN} file and set the user/group/ and syncthing home directory"
+		elog "before launching. Afterwards, you can start ${PN} by doing a: rc-config start ${PN}"
+	fi
 }
